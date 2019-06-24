@@ -1,0 +1,7 @@
+Name,Address,lat,long,accuracy,formatted_address,address_type,status
+Ido Bar,"Givar Ada, Israel",32.517078,34.955096,locality,"Binyamina-Giv'at Ada, Israel","locality,political",OK
+Kazbek Dyussembayev,"Nursultan, Kazakhstan",51.16052269999999,71.4703558,locality,"Nur-Sultan 020000, Kazakhstan","locality,political",OK
+Andres Godwin Sajise,UPLB Laguna Philippines,14.1648491,121.2412634,establishment,"Pedro R. Sandoval Ave, Los Baños, Laguna, Philippines","establishment,point_of_interest,university",OK
+Marzia Bilkiss,"Tangail, Bangladesh",24.2513451,89.9167104,locality,"Tangail, Bangladesh","locality,political",OK
+Prabhakaran Thanjavur Sambasivam,"Chennai, Tamilnadu, India",13.0826802,80.2707184,locality,"Chennai, Tamil Nadu, India","locality,political",OK
+Chat Kanchana-Udomkan,"Kanchanaburi, Thailand",14.1011393,99.4179431,colloquial_area,"Kanchanaburi, Mueang Kanchanaburi District, Kanchanaburi, Thailand","colloquial_area,locality,political",OK
