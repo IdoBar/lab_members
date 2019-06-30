@@ -1,8 +1,8 @@
 #### resources  ####
 # https://stackoverflow.com/questions/31668163/geographic-geospatial-distance-between-2-lists-of-lat-lon-points-coordinates
 # https://www.shanelynn.ie/massive-geocoding-with-r-and-google-maps/
-pacman::p_load(tidyverse, ggmap, glue, geosphere, pheatmap,
-               leaflet, leafpm, maps, paletteer) # countrycode, imager
+pacman::p_load(maps, tidyverse, ggmap, glue, geosphere, pheatmap,
+               leaflet, leafpm, paletteer) # countrycode, imager
 # See .Renviron for Google API key
 source("src/getGeo.R")
 
@@ -13,17 +13,30 @@ addresses <- readxl::read_excel("data/lab_members_addresses.xlsx") %>%
          mutate(first_name=sub(" .+", "", Name))
 # test <- addresses %>% mutate_geocode(Address, output="more")
 
-geodetails <- geocode(addresses$Address, output = "all", messaging=TRUE)
-names(geodetails) <- addresses$Address
-geodetails %>% discard(~ .$status=="OK") %>% iwalk(~message(glue("Could not find details for {.y}")))
-geodetails %>% keep(~ "university" %in% flatten_chr(.$results[[1]]$types)) %>% 
-  iwalk(~message(glue("{.y} is a university")))
+# geodetails <- geocode(addresses$Address, output = "all", messaging=TRUE)
+# names(geodetails) <- addresses$Address
 
+# geodetails %>% keep(~ "university" %in% flatten_chr(.$results[[1]]$types)) %>% 
+#   iwalk(~message(glue("{.y} is a university")))
+
+
+# try to extract the information using tidyr
+test <- tibble(query=addresses$Address, results=map(geodetails, "results"), status=map_chr(geodetails, "status")) %>% mutate(formatted_address=pluck(geodetails, "formatted_address"))
+test %>% purrr::pluck("results") %>% map_chr(.x= flatten(.), "formatted_address")
+# extract geocoding information
 update_addresses <- TRUE
 if (isTRUE(update_addresses)){
-  # Get geodetails
   
-  results <- geodetails %>% keep(~ .$status=="OK") %>% map_df(~tibble(
+  # Get geodetails
+  geodetails <- geocode(addresses$Address, output = "all", messaging=TRUE)
+  names(geodetails) <- addresses$Address
+  # notif if some addresses couldn't be found
+  geodetails %>% discard(~ .$status=="OK") %>% iwalk(~message(glue("Could not find details for {.y}")))
+  # svae just successful queries 
+  geo_ok <- geodetails %>% keep(~ .$status=="OK")
+  # using a mixture of purrr() and base R list verbs
+  # main challenges are to drill down into the first list element within the results list for each list item, then extract the long_name and short_name from address_components slot, but only if the address component type is "country" (which is nested in the "types" slot within each "address_components") 
+  results <- geo_ok %>% map_df(~tibble(
     formatted_address=.$results[[1]]$formatted_address,
     lat=.$results[[1]]$geometry$location$lat,
     long=.$results[[1]]$geometry$location$lng,
@@ -31,7 +44,10 @@ if (isTRUE(update_addresses)){
       keep(~ "country" %in% flatten_chr(.$types)) %>% flatten() %>% .$long_name,
     country_code=.$results[[1]]$address_components %>% 
       keep(~ "country" %in% flatten_chr(.$types)) %>% flatten() %>% .$short_name,
-    status=.$status)) %>% mutate(query=names(geodetails %>% keep(~ .$status=="OK")))
+    status=.$status)) %>% mutate(query=names(geo_ok))
+  
+  
+  
   geo_df <- results %>% 
   # geo_df <- addresses$Address %>% map_dfr(~getGeoDetails(.x)) %>% 
     left_join(addresses, ., by=c("Address"="query")) %>% 

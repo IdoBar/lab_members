@@ -56,7 +56,7 @@ Members of the Sustainable Food Production Group (at Griffith University) provid
 The address of each member was converted to coordinates using the `geocode()` function from the `r fontFmt("ggmap")` package (utilising Google Maps API and parsed based on the script in [Shane Lynn's blog post](https://www.shanelynn.ie/massive-geocoding-with-r-and-google-maps/)). Coutry names were translated to ISO 3166 2-letter codes (short names) using the same output from the Google API. 
 
 
-```{r addresses, message=TRUE}
+```{r addresses}
 addresses <- readxl::read_excel("data/lab_members_addresses.xlsx") %>% 
            mutate(first_name=sub(" .+", "", Name))
 update_addresses <- TRUE

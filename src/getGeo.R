@@ -21,22 +21,11 @@ getGeoDetails <- function(address){
   if (geo_reply$status != "OK"){
     return(answer)
   }   
-  #else, extract what we need from the Google server reply into a dataframe:
-  # country_info <- geo_reply$results[[1]]$address_components %>% 
-  #   keep(~ "country" %in% map_chr(.$types, c)) %>% flatten() # %>% .$long_name
-  # Filter(function(x) "country" %in% map_chr(x$types, c),
-  # geo_reply$results[[1]]$address_components) %>% flatten()
-  
-
-  # for (i in 1:length(geo_reply$results[[1]]$address_components)){
-  #   # i=1
-  #   types <- unlist(geo_reply$results[[1]]$address_components[[i]][["types"]])
-  #   if ("country" %in% types) {
-  #     country_slot <- i
-  #   }
-  # }
-  # country_slot <- length(geo_reply$results[[1]]$address_components)
-  # results <- map_df(geo_reply$results[[1]]$address_components, extract, c("long_name", "short_name"))[country_slot,] %>% mutate(formatted_address=geo_reply$results[[1]][["formatted_address"]])
+  # else, extract what we need from the Google server reply into a dataframe:
+  # main challenges are to drill down into the first list element within the results list for each list
+  # item, then extract the long_name and short_name from address_components slot, but only if the address
+  # component type is "country" (which is nested in the "types" slot within each "address_components") 
+  ### purrr approach ###
   answer <- geo_reply %>% map_df(~tibble(
     formatted_address=.$results[[1]]$formatted_address,
     lat=.$results[[1]]$geometry$location$lat,
@@ -48,7 +37,21 @@ getGeoDetails <- function(address){
     address_type <- paste(.$results[[1]]$types, collapse=','),
     status=.$status))
   
-  # 
+  ### base R/combined purrr approach ###
+  # country_info <- geo_reply$results[[1]]$address_components %>% 
+  #   keep(~ "country" %in% map_chr(.$types, c)) %>% flatten() # %>% .$long_name
+  # country_info <- Filter(function(x) "country" %in% map_chr(x$types, c),
+  # geo_reply$results[[1]]$address_components) %>% flatten()
+  
+  ### completely base R approach  ###
+  # for (i in 1:length(geo_reply$results[[1]]$address_components)){
+  #   # i=1
+  #   types <- unlist(geo_reply$results[[1]]$address_components[[i]][["types"]])
+  #   if ("country" %in% types) {
+  #     country_info <- geo_reply$results[[1]]$address_components[[i]]
+  #   }
+  # }
+  #  
   # answer$Country <- country_info$long_name
   # answer$country_code <- country_info$short_name
   # answer$lat <- geo_reply$results[[1]]$geometry$location$lat
