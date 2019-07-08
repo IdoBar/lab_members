@@ -137,7 +137,9 @@ rect_flags %>% mutate_if(is.double, ~round(.x, 3)) %>%
 
 Once I have the dataframe with the flags information, I could iterate through it (this time using `pmap()` function from [purrr](https://purrr.tidyverse.org/)) to create an icon-set that I could use as markers in the map.
 
+
 I then plotted the map with [leaflet](https://rstudio.github.io/leaflet/) package, using the `Esri.NatGeoWorldMap` tiles as a basemap, along with optional scale bar and distance/area measurement tool (the map is interactive, please play with it and hover over the markers).
+
 
 ```{r flags_map}
 # Create a named list of icons/flags
