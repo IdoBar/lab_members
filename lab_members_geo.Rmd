@@ -137,7 +137,7 @@ rect_flags %>% mutate_if(is.double, ~round(.x, 3)) %>%
 
 Once I have the dataframe with the flags information, I could iterate through it (this time using `pmap()` function from `r fontFmt("purrr")`) to create an icon-set that I could use as markers in the map.
 
-I then plotted the map with the `Esri.NatGeoWorldMap` tiles as a basemap, along with optional scale bar and distance/area measurement tool (the map is interactive, please play with it and hover over the markers).
+I then plotted the map with `r fontFmt("leaflet")` package, using the `Esri.NatGeoWorldMap` tiles as a basemap, along with optional scale bar and distance/area measurement tool (the map is interactive, please play with it and hover over the markers).
 
 ```{r flags_map}
 # Create a named list of icons/flags
@@ -264,3 +264,7 @@ summary %>% mutate_if(is.numeric, ~round(., 2)) %>%
   kable(escape = FALSE, caption = tbls(name="dist_sum")) %>% 
   kable_styling(bootstrap_options = "striped", full_width = F)
 ```
+
+# Alternatives
+
+A few other mapping packages are available as an alternative to [leaflet](https://rstudio.github.io/leaflet/), such as [mapview](https://r-spatial.github.io/mapview/) (along with its extension package to leaflet [leafem](https://github.com/r-spatial/leafem)).   [googleway](http://symbolixau.github.io/googleway/) is another package that allows usage of Google Maps and the entire Google APIs (places, directions, roads, distances, geocoding, elevation and timezone). 
