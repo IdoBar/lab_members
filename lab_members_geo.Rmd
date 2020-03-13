@@ -18,7 +18,7 @@ csl: style/springer-basic-improved-author-date-with-italic-et-al-period.csl
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 pacman::p_load(tidyverse, captioner, ggmap, glue, geosphere,
                pheatmap, kableExtra, DT, scales, formattable, xml2,
-               leaflet, leafpm, paletteer)
+               leaflet, leafpm)
 # countrycode
 # See .Renviron for Google API key
 # load function to convert address to coordinates (using Google API)
@@ -48,7 +48,7 @@ figs(name="heatmap", "Heatmap showing the distance between group members and the
 
 # Geographical mapping of group members
 
-In our last group lunch we realised that each one of our research group came from a different country, so we wondered who's closest and who's furthest from each other.  This post describes a little toy example of collecting addresses (in this case our research group members) and plotting them on a map, while demonstrating the distances between members.
+In our last group lunch we realised that each member of our research group came from a different country, so we wondered who's closest and who's furthest from each other.  This post describes a little toy example of collecting addresses (in this case our research group members) and plotting them on a map, while demonstrating the distances between members.
 
 ## Collect addresses
 
@@ -57,6 +57,11 @@ The address of each member was converted to coordinates using the `geocode()` fu
 
 
 ```{r addresses}
+# load required packages
+pacman::p_load(tidyverse, ggmap, glue, geosphere,
+               pheatmap, scales, formattable, xml2,
+               leaflet, leafpm, paletteer)
+# read in addresses from an excel
 addresses <- readxl::read_excel("data/lab_members_addresses.xlsx") %>% 
            mutate(first_name=sub(" .+", "", Name))
 update_addresses <- TRUE
@@ -222,7 +227,7 @@ dimnames(dist_mat) <- list(geo_df$first_name, geo_df$first_name)
 dist_mat[dist_mat==0] <- NA
 
 pheatmap(dist_mat, cutree_rows = 3, 
-         color = paletteer_c(viridis, inferno, 30, direction = -1),
+         color = paletteer_c("viridis::inferno", 30, direction = -1),
          cutree_cols = 3)
 
 ```
@@ -244,7 +249,7 @@ as.data.frame(dist_mat) %>%
 Finally, we can look at the closest colleague of each member to decide who's hometown is the most isolated (`r tbls(name="dist_sum", display="cite")`).
 
 ```{r min_dist}
-# chaneg into a long format
+# change into a long format
 long_dist <- as.data.frame(dist_mat) %>% rownames_to_column("Name") %>% 
   gather("Colleague", "Distance", 2:ncol(.)) 
 # find closest location for each member
