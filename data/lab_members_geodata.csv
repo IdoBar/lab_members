@@ -1,12 +1,10 @@
 Name,Address,first_name,formatted_address,lat,long,Country,country_code,status
 Ido Bar,"Givat Ada, Israel",Ido,"Binyamina-Giv'at Ada, Israel",32.517078,34.955096,Israel,IL,OK
-Kazbek Dyussembayev,"Nursultan, Kazakhstan",Kazbek,"Nur-Sultan 020000, Kazakhstan",51.16052269999999,71.4703558,Kazakhstan,KZ,OK
-Andres Godwin Sajise,"UPLB Laguna, Philippines",Andres,"Pedro R. Sandoval Ave, Los Baños, Laguna, Philippines",14.1648491,121.2412634,Philippines,PH,OK
-Marzia Bilkiss,"Tangail, Bangladesh",Marzia,"Tangail, Bangladesh",24.2513451,89.9167104,Bangladesh,BD,OK
 Sam (Prabhakaran) Thanjavur Sambasivam,"Chennai, Tamilnadu, India",Sam,"Chennai, Tamil Nadu, India",13.0826802,80.2707184,India,IN,OK
 Chat Kanchana-Udomkan,"Kanchanaburi, Thailand",Chat,"Kanchanaburi, Thailand",14.1011393,99.4179431,Thailand,TH,OK
-Usana Nantawan,"Kamphaeng Phet, Thailand",Usana,"Kamphaeng Phet, Thailand",16.4827798,99.5226618,Thailand,TH,OK
-Mahsa Khorramdelazad,"Tehran, Iran",Mahsa,"Tehran, Tehran Province, Iran",35.6891975,51.3889736,Iran,IR,OK
-Lab,"Nathan, QLD, Australia",Lab,"Nathan QLD 4111, Australia",-27.55,153.05,Australia,AU,OK
+Lab,"Nathan, QLD, Australia",Lab,"Nathan QLD 4111, Australia",-27.5434365,153.0426884,Australia,AU,OK
 Rebecca Ford,"Hartley Wintney, Hampshire, UK",Rebecca,"Hartley Wintney, Hook RG27, UK",51.305296,-0.9040600000000001,United Kingdom,GB,OK
 Shane (Zi Wei) Zhou,"Nantong, Jiangsu, China",Shane,"Nantong, Jiangsu, China",31.980171,120.894291,China,CN,OK
+Rachel Diva Soh,"Jakarta, Indonesia",Rachel,"Jakarta, Indonesia",-6.2087634,106.84559900000001,Indonesia,ID,OK
+Melody Christie,"Alberton, Canada",Melody,"Alberton, PE, Canada",46.8131294,-64.0648274,Canada,CA,OK
+Jeremy Brownlie,"Canberra, Australia",Jeremy,"Canberra ACT 2601, Australia",-35.2809368,149.1300092,Australia,AU,OK
