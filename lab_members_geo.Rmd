@@ -196,7 +196,7 @@ round_flags %>% select(Country, country_code, flag_file) %>%
 I plotted the same map as before, but using the emoji flags as markers and a different basemap (`Esri.WorldStreetMap`) for the interest (see complete list of available maps [here](http://leaflet-extras.github.io/leaflet-providers/preview/index.html) and note that some providers require registration or setting up an API key, see [details](https://github.com/leaflet-extras/leaflet-providers))
 
 ```{r emoji_map}
-base_height <- 15
+base_height <- 20
 # Create a named list of icons/flags
 emojiIcons <- icons(glue("img/emojis/{round_flags$country_code}.svg"),
                     iconHeight = base_height, iconWidth = base_height,
