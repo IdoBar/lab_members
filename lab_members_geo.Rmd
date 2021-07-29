@@ -1,7 +1,7 @@
 ---
 title: "Mapping of the Sustainable Food Production Group members"
 author: "Ido Bar"
-date: "25/06/2019"
+date: "29/07/2021"
 output: 
     html_document:
       css: "style/style.css"
@@ -96,7 +96,7 @@ Flags of the representative countries were downloaded to be used as map markers,
 
 ```{r rect_flags}
 # download flags
-update_flags <- FALSE
+update_flags <- TRUE
 walk(geo_df$country_code, ~{
   if (!file.exists(glue("img/flags/{.x}.svg")) | isTRUE(update_flags)) {
     download.file(glue('https://raw.githubusercontent.com/google/region-flags/gh-pages/svg/{.x}.svg'), 
@@ -235,7 +235,7 @@ pheatmap(dist_mat, cutree_rows = 3,
 The distances can actually be observed in the matrix:
 
 ```{r dist_matrix, echo=FALSE}
-as.data.frame(dist_mat) %>%
+dist_mat %>% as_tibble() %>% 
   mutate_all(~round(., 2)) %>% 
   # mutate_all(~color_bar("lightgreen")(.)) %>% 
   mutate_all(~cell_spec(., color = "white", bold = T,
@@ -253,21 +253,23 @@ Finally, we can look at the closest colleague of each member to decide who's hom
 long_dist <- as.data.frame(dist_mat) %>% rownames_to_column("Name") %>% 
   gather("Colleague", "Distance", 2:ncol(.)) 
 # find closest location for each member
-closest <- long_dist %>%  filter(!is.na(Distance)) %>% group_by(Name) %>% 
-  summarise(min_dist=min(Distance)) %>% 
-  arrange(desc(min_dist)) # `Distance to closest colleague`
+closest <- long_dist %>%  filter(!is.na(Distance)) %>% group_by(Name) %>% slice_min(Distance) %>% 
+  mutate(Closest=glue("{Colleague} ({round(Distance, 0)} km)")) %>% select(Name, Closest)
+   # `Distance to closest colleague`
 # find furthest location from each member and combine tables
-summary <- long_dist %>%  filter(!is.na(Distance)) %>% group_by(Name) %>% 
-  summarise(max_dist=max(Distance)) %>%  # `Distance to furthest colleague`
-  arrange(desc(max_dist)) %>% inner_join(closest, .) %>% 
-  setNames(., c("Name", "Distance to closest location", "Distance to furthest location"))
+summary_table <- long_dist %>%  filter(!is.na(Distance)) %>% group_by(Name) %>% 
+  slice_max(Distance) %>% 
+  mutate(Furthest=glue("{Colleague} ({round(Distance, 0)} km)"))  %>%  # `Distance to furthest colleague`
+  select(Name, Furthest) %>% inner_join(closest, .) %>% 
+  setNames(., c("Name", "Closest member", "Furthest member"))
 ```
 ```{r dist_sum_table, echo=FALSE}
-summary %>% mutate_if(is.numeric, ~round(., 2)) %>% 
-  # mutate_all(~color_bar("lightgreen")(.)) %>% 
-  mutate_if(is.numeric, ~cell_spec(., color = "white", bold = T,
-    background = spec_color(., end = 0.9, option = "A",
-                            direction = -1))) %>%
+summary_table %>% 
+  # mutate_if(is.numeric, ~round(., 2)) %>% 
+  # # mutate_all(~color_bar("lightgreen")(.)) %>% 
+  # mutate_if(is.numeric, ~cell_spec(., color = "white", bold = T,
+  #   background = spec_color(., end = 0.9, option = "A",
+  #                           direction = -1))) %>%
   kable(escape = FALSE, caption = tbls(name="dist_sum")) %>% 
   kable_styling(bootstrap_options = "striped", full_width = F)
 ```
