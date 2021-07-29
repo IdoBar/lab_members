@@ -58,8 +58,8 @@ The address of each member was converted to coordinates using the `geocode()` fu
 
 ```{r addresses}
 # load required packages
-pacman::p_load(tidyverse, ggmap, glue, geosphere,
-               pheatmap, scales, formattable, xml2,
+pacman::p_load(tidyverse, ggmap, glue, geosphere, countrycode,
+               pheatmap, scales, formattable, xml2, htmltab,
                leaflet, leafpm, paletteer)
 # read in addresses from an excel
 addresses <- readxl::read_excel("data/lab_members_addresses.xlsx") %>% 
@@ -67,21 +67,31 @@ addresses <- readxl::read_excel("data/lab_members_addresses.xlsx") %>%
 update_addresses <- TRUE
 if (isTRUE(update_addresses)){
   # Get geodetails (up to 2,500 queries a day), otherwise use getGeo
-  geodetails <- geocode(addresses$Address, output = "all", messaging=TRUE)
+  geodetails <- geocode(addresses$Address, output = "all", messaging=TRUE) # %>% 
+    # mutate(query=addresses$Address, formatted_address=snakecase::to_any_case(address, case = "title", parsing_option = -1)) 
   names(geodetails) <- addresses$Address
   geodetails %>% discard(~ .$status=="OK") %>% iwalk(~message(glue("Could not find details for {.y}")))
   # geodetails %>% keep(~ "university" %in% flatten_chr(.$results[[1]]$types)) %>% 
   #   walk(~message(glue("{.} is a university")))
   
-  results <- geodetails %>% keep(~ .$status=="OK") %>% map_df(~tibble(
+  results <- geodetails %>% keep(~ .$status=="OK") %>% 
+    # tibble(query=names(.)) %>% select(query) %>% 
+    map_df(~tibble(
     formatted_address=.$results[[1]]$formatted_address,
     lat=.$results[[1]]$geometry$location$lat,
-    long=.$results[[1]]$geometry$location$lng,
-    Country=.$results[[1]]$address_components %>% 
-      keep(~ "country" %in% flatten_chr(.$types)) %>% flatten() %>% .$long_name,
-    country_code=.$results[[1]]$address_components %>% 
-      keep(~ "country" %in% flatten_chr(.$types)) %>% flatten() %>% .$short_name,
-    status=.$status)) %>% mutate(query=names(geodetails %>% keep(~ .$status=="OK")))
+    long=.$results[[1]]$geometry$location$lng)) %>% 
+    mutate(query=names(geodetails %>% keep(~ .$status=="OK")),
+           Country = gsub(".+, *", "", query),
+           country_code=countrycode(Country, origin = 'country.name', destination = 'iso2c'))
+  
+    # 
+    # Country=.$results[[1]]$address_components %>% 
+    #   keep(~ "country" %in% flatten_chr(.$types)) %>% 
+    #   flatten() %>% .$long_name,
+    # country_code=.$results[[1]]$address_components %>% 
+    #   keep(~ "country" %in% flatten_chr(.$types)) %>% 
+    #   flatten() %>% .$short_name,
+    # status=.$status)) %>% mutate(query=names(geodetails %>% keep(~ .$status=="OK")))
   geo_df <- results %>% 
   # geo_df <- addresses$Address %>% map_dfr(~getGeoDetails(.x)) %>% 
     left_join(addresses, ., by=c("Address"="query")) %>% 
@@ -169,7 +179,7 @@ An alternative visualisation was then used, trying to mimick the [ggflags](https
 
 ```{r emoji_flags}
 # Use round emoji flags as markers
-round_flags <- htmltab::htmltab("https://apps.timwhitlock.info/emoji/tables/iso3166") %>% as_tibble() %>% 
+round_flags <- htmltab("https://apps.timwhitlock.info/emoji/tables/iso3166") %>% as_tibble() %>% 
   mutate(flag_file=tolower(sub(" ", "-", 
                               gsub("U+", "", Unicode, fixed = TRUE)))) %>%
   select(Country=Name, country_code=ISO, flag_file) %>% 
