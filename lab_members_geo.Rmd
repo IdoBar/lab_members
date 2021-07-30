@@ -62,7 +62,7 @@ pacman::p_load(tidyverse, ggmap, glue, geosphere, countrycode,
                pheatmap, scales, formattable, xml2, htmltab,
                leaflet, leafpm, paletteer)
 # read in addresses from an excel
-addresses <- readxl::read_excel("data/Addressbook.xlsx") %>% 
+addresses <- readxl::read_excel("data/lab_members_addresses.xlsx") %>% 
            mutate(first_name=sub(" .+", "", Name))
 update_addresses <- TRUE
 if (isTRUE(update_addresses)){
