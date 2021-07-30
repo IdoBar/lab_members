@@ -62,7 +62,7 @@ pacman::p_load(tidyverse, ggmap, glue, geosphere, countrycode,
                pheatmap, scales, formattable, xml2, htmltab,
                leaflet, leafpm, paletteer)
 # read in addresses from an excel
-addresses <- readxl::read_excel("data/lab_members_addresses.xlsx") %>% 
+addresses <- readxl::read_excel("data/Addressbook.xlsx") %>% 
            mutate(first_name=sub(" .+", "", Name))
 update_addresses <- TRUE
 if (isTRUE(update_addresses)){
@@ -76,12 +76,19 @@ if (isTRUE(update_addresses)){
   
   results <- geodetails %>% keep(~ .$status=="OK") %>% 
     # tibble(query=names(.)) %>% select(query) %>% 
-    map_df(~tibble(
-    formatted_address=.$results[[1]]$formatted_address,
-    lat=.$results[[1]]$geometry$location$lat,
-    long=.$results[[1]]$geometry$location$lng)) %>% 
-    mutate(query=names(geodetails %>% keep(~ .$status=="OK")),
-           Country = gsub(".+, *", "", query),
+    imap_dfr(~tibble(query=.y, #country=sub(".+, *", "", .y),
+    formatted_address=.x$results[[1]]$formatted_address,
+    lat=.x$results[[1]]$geometry$location$lat,
+    long=.x$results[[1]]$geometry$location$lng,
+    Country=ifelse(isTRUE(.x$results[[1]]$address_components %>% map_lgl(~"country" %in% .$types) %>% any()),
+                   .x$results[[1]]$address_components %>%
+      keep(~ "country" %in% flatten_chr(.$types)) %>%
+      flatten() %>% .$long_name, sub(".+, *", "", .y)))) %>% 
+    # country_code=.$results[[1]]$address_components %>%
+    #   keep(~ "country" %in% flatten_chr(.$types)) %>%
+    #   flatten() %>% .$short_name) %>% 
+    mutate(#query=names(geodetails %>% keep(~ .$status=="OK")),
+           #Country = ifelse(is.null(Country), gsub(".+, *", "", formatted_address), Country),
            country_code=countrycode(Country, origin = 'country.name', destination = 'iso2c'))
   
     # 
@@ -203,7 +210,7 @@ round_flags %>% select(Country, country_code, flag_file) %>%
 
 ```
 
-I plotted the same map as before, but using the emoji flags as markers and a different basemap (`Esri.WorldStreetMap`) for the interest (see complete list of available maps [here](http://leaflet-extras.github.io/leaflet-providers/preview/index.html) and note that some providers require registration or setting up an API key, see [details](https://github.com/leaflet-extras/leaflet-providers))
+I plotted the same map as before, but using the emoji flags as markers and a different basemap (`Esri.WorldStreetMap`) for the interest (see complete list of available maps with `names(leaflet.providers::providers_loaded()$providers)` and a preview [here](http://leaflet-extras.github.io/leaflet-providers/preview/index.html) and note that some providers require registration or setting up an API key, see [details](https://github.com/leaflet-extras/leaflet-providers))
 
 ```{r emoji_map}
 base_height <- 20
@@ -213,7 +220,7 @@ emojiIcons <- icons(glue("img/emojis/{round_flags$country_code}.svg"),
                     iconAnchorX = 0, iconAnchorY = 0)
 
 # Create the leaflet map
-leaflet(geo_df) %>% addProviderTiles("Esri.WorldStreetMap") %>% # 
+leaflet(geo_df) %>% addProviderTiles("Esri.WorldStreetMap") %>% # "Thunderforest.MobileAtlas", "USGS.USImageryTopo"
   addMarkers(popup = ~Name, label = ~Name, 
              icon = emojiIcons) %>% 
   addScaleBar(position = "bottomright",
