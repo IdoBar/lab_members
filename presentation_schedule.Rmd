@@ -1,0 +1,33 @@
+---
+title: "Presentation Schedule"
+author: "Ido Bar"
+date: "15/06/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse, lubridate, gt, janitor)
+```
+
+## Presentation Schedule
+
+Each meeting, a member of the team presents a quick presentation on some scientific topic, which can be their work, other published research/methods or anything else that's relevant for our research (can be about academic writing, computer skills, etc.).  
+Another member of the team will chair the presentation, i.e, he/she will introduce the speaker, manage questions and engage other members in the conversation.
+
+To determine the order of presentations and chairperson, we will use the following approach:
+
+```{r random-speaker}
+start_date <- dmy("23/06/2022")
+members <- c("Fawad", "Matin", "Gurpreet", "Shane", "Mel", "Moutoshi",  "Josh", "Hayley",
+             "Henrietta", "Sam", "Rebecca", "Mahmuda", "Ido", "Chat")
+set.seed(15)
+presentation_schedule <- tibble(presenter = sample(members), chairperson = sample(members), 
+                                date = seq(start_date, by = "2 week",
+                                           length.out = length(members)))
+presentation_schedule %>% 
+  clean_names("title") %>% 
+  gt() %>% 
+  fmt_date(Date, date_style = "day_month_year")
+
+```

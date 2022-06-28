@@ -1,7 +1,7 @@
 ---
 title: "Mapping of the Sustainable Food Production Group members"
 author: "Ido Bar"
-date: "29/07/2021"
+date: "23/06/2022"
 output: 
     html_document:
       css: "style/style.css"
